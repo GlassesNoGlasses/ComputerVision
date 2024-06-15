@@ -21,7 +21,7 @@ mpDraw = mp.solutions.drawing_utils
 
 # images
 DRAW_IMG = np.ones((FRAME_HEIGHT, FRAME_WIDTH, 3), dtype = np.uint8) * 255
-INSTUCTION_IMG = np.ones((300, 250, 3), dtype = np.uint8) * 255
+INSTUCTION_IMG = np.ones((350, 250, 3), dtype = np.uint8) * 255
 
 # image drawing
 line_coordinates = {'start': (-1, -1), 'end': (-1, -1)}
@@ -55,6 +55,7 @@ D_KEY = 100
 P_KEY = 112
 SPACE = 32
 ESC = 27
+ENTER = 13
 
 # feedback
 color_feedback = "Color: " + chosen_color['name']
@@ -77,6 +78,8 @@ while cap.isOpened():
         chosen_color_index = (chosen_color_index + 1) % NUM_COLORS
     elif key == P_KEY:
         DRAW_IMG = np.ones((FRAME_HEIGHT, FRAME_WIDTH, 3), dtype = np.uint8) * 255
+    elif key == ENTER:
+        cv2.imwrite('drawing.jpg', DRAW_IMG)
     
     # update the colors
     chosen_color = COLORS[chosen_color_index]
@@ -132,6 +135,8 @@ while cap.isOpened():
                 (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, BLACK['rgb'], 2)
     cv2.putText(inst_img, controls_feedback['clear'],
                 (10, 250), cv2.FONT_HERSHEY_SIMPLEX, 1, BLACK['rgb'], 2)
+    cv2.putText(inst_img, "Save: (ENTER)",
+                (10, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, BLACK['rgb'], 2)
     
     # display the frame
     cv2.imshow('Instructions', inst_img)
