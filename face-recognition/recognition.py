@@ -9,7 +9,7 @@ ESC = 27
 
 # saving face image logic
 MAX_FACES = 10
-THRESHOLD = (150, 150)
+THRESHOLD = (500, 500)
 
 ## make faces directory to store faces if it doesn't exist
 if not os.path.exists('./faces'):
@@ -23,6 +23,14 @@ face_classifier = cv2.CascadeClassifier(
     cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
 )
 
+def padRectangle(x, y, w, h, size=500):
+    ''' Pad the rectangle around the face to be 500x500.'''
+
+    width_padding = size - w
+    height_padding = size - h
+
+    return (x, y, w + width_padding, h + height_padding)
+
 def getFaceCoords(gray_frame):
     ''' Outlines the face in the frame if it exists.
         Return the coordinates of rectangle if face exists.'''
@@ -33,14 +41,12 @@ def getFaceCoords(gray_frame):
     # get the faces
     faces = face_classifier.detectMultiScale(gray_frame, 1.3, 5)
 
-    # pad the rectangle around the face
-    padding = 20
-
-    # draw the rectangle around the face
+    # get rectangle around faces
     for (x, y, w, h) in faces:
-        coordinates = (x + padding, y + padding, w + padding, h + padding)
+        coordinates = padRectangle(x, y, w, h)
     
     return coordinates
+
 
 def filterImageBySize(image, size=THRESHOLD):
     ''' Return True if the size of the image passes the threshold specifications.'''
@@ -51,6 +57,7 @@ def filterImageBySize(image, size=THRESHOLD):
     width, height = size
 
     return image.size[0] >= width and image.size[1] >= height
+
 
 def getFaces():
     ''' Capture the faces from the camera feed and save them to the faces directory.'''
