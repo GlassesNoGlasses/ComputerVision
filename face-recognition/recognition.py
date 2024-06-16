@@ -8,8 +8,8 @@ from PIL import Image
 ESC = 27
 
 # saving face image logic
-num_faces = 0
-THRESHOLD = (100, 100)
+MAX_FACES = 10
+THRESHOLD = (150, 150)
 
 ## make faces directory to store faces if it doesn't exist
 if not os.path.exists('./faces'):
@@ -23,7 +23,7 @@ face_classifier = cv2.CascadeClassifier(
     cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
 )
 
-def getFaceCoords(gray_frame, dest_image):
+def getFaceCoords(gray_frame):
     ''' Outlines the face in the frame if it exists.
         Return the coordinates of rectangle if face exists.'''
     
@@ -31,7 +31,7 @@ def getFaceCoords(gray_frame, dest_image):
     coordinates = None
 
     # get the faces
-    faces = face_classifier.detectMultiScale(gray, 1.3, 5)
+    faces = face_classifier.detectMultiScale(gray_frame, 1.3, 5)
 
     # pad the rectangle around the face
     padding = 20
@@ -52,14 +52,14 @@ def filterImageBySize(image, size=THRESHOLD):
 
     return image.size[0] >= width and image.size[1] >= height
 
-while camera.isOpened():
-        # get keyboard input
-        key = cv2.waitKey(33)
+def getFaces():
+    ''' Capture the faces from the camera feed and save them to the faces directory.'''
 
-        # break the loop if 'ESC' is pressed
-        if (key == ESC):
-            break
-    
+    # number of current faces stored
+    num_faces = 0
+
+    # loop through the camera feed
+    while num_faces < MAX_FACES:
         # read the camera
         ret, frame = camera.read()
     
@@ -70,16 +70,20 @@ while camera.isOpened():
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         
         # get face coordinates
-        coords = getFaceCoords(gray, frame)
+        coords = getFaceCoords(gray)
+
+        # default face frame
+        face_frame = frame
     
         # get the face coordinates
         if (coords and filterImageBySize(Image.fromarray(frame))):
             num_faces += 1
             x, y, w, h = coords
-            cv2.imwrite(f'./faces/face_{num_faces}.jpg', frame[y:y+h, x:x+w])
+            face_frame = frame[y:y+h, x:x+w]
+            cv2.imwrite(f'./faces/face_{num_faces}.jpg', face_frame)
         
         # stop the camera after 10 faces
-        if (num_faces == 10):
+        if (num_faces >= MAX_FACES):
             break
         
         # TODO: remove after testing
@@ -87,7 +91,16 @@ while camera.isOpened():
             cv2.rectangle(frame, (coords[0], coords[1]), (coords[0] + coords[2], coords[1] + coords[3]), (255, 0, 0), 2)
         
         # display the frame
-        cv2.imshow('feed', frame)
+        cv2.imshow('Face Feed', frame)
 
+
+# main function
+def main():
+    # get faces from the camera feed
+    getFaces()
+    print("Got all faces!")
+
+
+main()
 camera.release()
 cv2.destroyAllWindows()
