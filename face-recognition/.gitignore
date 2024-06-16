@@ -6,3 +6,4 @@
 !.gitignore
 !camera.py
 !recognition.py
+!test_faces
