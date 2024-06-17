@@ -1,0 +1,16 @@
+
+# ignore everything
+*
+
+# except for these files
+!.gitignore
+
+## required python files
+!camera.py
+!trainer.py
+!detector.py
+!recognizer.py
+
+## required data files
+!test_faces
+!test_faces/*
