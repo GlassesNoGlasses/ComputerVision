@@ -10,6 +10,7 @@
 !trainer.py
 !detector.py
 !recognizer.py
+!eigenface.py
 
 ## required data files
 !test_faces
