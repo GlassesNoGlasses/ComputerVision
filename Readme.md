@@ -57,4 +57,25 @@ Python Libraries:
 
 How to Run: Install the above libraries, have a working camera, then run `recognizer.py`.
 
-Future Prospects: Building an Eigenface or Fisherface model from scratch utilizing Scikit-Learn and other python libraries.
+### Update:
+
+Additional Python Libraries:
+- pickle
+- SKLearn
+- time
+
+I wanted to design my own face recognition model using the Eigenface approach as a fun exercise. This model has now been added in the file `eigenface.py`. You can select either the `LBPH` or `Eigenface` model by running `recognizer.py` and selecting either model in the terminal as input.
+
+How it works: The model is based on the Eigenface approach, utilizing Principal Component Analysis (PCA) for data manipulation and Support Vector Machine (SVM) classification model from SKLearn. Images are captured and resized to `IMG_SIZES = (500, 500)`, where PCA is then performed, and finally inputted to train the SVC model.
+
+Evaluation: The Eigenface model currently sits at ~85% accuracy in recognizing the user. More training and testing data (i.e. more user and non-user faces) would improve the model's
+precision, as the current base images used are 25 user images and 25 non-user images; not a large sample size. The problems of the Eigenface approach also persist, where distorted user 
+face images (i.e. varying angles, lighting, and clothing) will impact the precision of the model.
+
+The model is exported using `pickle` into the file named `eigenface_model.pkl`, where you can load the model using `pickel` at a later date.
+
+<img width="382" alt="image" src="https://github.com/GlassesNoGlasses/ComputerVision/assets/59126714/4376ef5a-0063-47fb-adc3-d79e3a8292f4">
+
+A fun project! 10/10 IGN recommend.
+
+
