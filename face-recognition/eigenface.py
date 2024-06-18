@@ -123,6 +123,10 @@ class Eigenface():
         predictions = self.svc.predict(self.pca.transform(self.testX))
         print(metrics.classification_report(self.testY, predictions,
             target_names=['imposter', 'user']))
+    
+        # save the model
+        with open('eigenface_model.pkl','wb') as f:
+            pickle.dump(self.svc, f)
 
 
     def predictEigenface(self):
@@ -182,4 +186,4 @@ if __name__ == '__main__':
     eigenface = Eigenface()
     eigenface.pcaInit()
     eigenface.trainEigenface()
-    eigenface.predictEigenface()
+    # eigenface.predictEigenface()
