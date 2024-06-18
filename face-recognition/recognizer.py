@@ -43,8 +43,6 @@ def main():
         if face_frame is None or coords is None:
             continue
 
-        # gray_frame = cv2.cvtColor(face_frame, cv2.COLOR_BGR2GRAY)
-
         x, y, w, h = coords
 
         # predict the face

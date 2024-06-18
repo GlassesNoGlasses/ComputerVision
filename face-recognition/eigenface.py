@@ -3,6 +3,8 @@ import time
 import numpy as np
 import pandas as pd
 import cv2
+import pickle
+from detector import FaceDetector
 from sklearn import svm
 from sklearn import decomposition
 from sklearn import metrics
@@ -127,6 +129,7 @@ class Eigenface():
         ''' Predict the face using the eigenface model.'''
 
         camera = cv2.VideoCapture(1)
+        detector = FaceDetector()
 
         while camera.isOpened():
 
@@ -143,14 +146,30 @@ class Eigenface():
                 print('Error reading frame.')
                 break
 
-            # convert frame to greyscale
-            grey_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            # get the face frame
+            face_image, coords = detector.getFaceFrame(frame)
+
+            # could not detect face
+            if face_image is None or face_image.shape != IMG_SIZES or coords is None:
+                continue
+
+            # get face coords
+            x, y, w, h = coords
+
+            # draw rectangle on face
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            
+            # convert face image to numpy array
+            pca_image = face_image.flatten()
 
             # apply PCA dimension reduction and predict
-            pca_frame = self.pca.transform(grey_frame)
+            pca_frame = self.pca.transform(pca_image.reshape(1, -1))
             prediction = self.svc.predict(pca_frame)
 
-            print(prediction)
+            if prediction[0] == 1:
+                cv2.putText(frame, 'Person: User', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+            else:
+                cv2.putText(frame, 'Person: Imposter', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
             cv2.imshow('Eigenface', frame)
         
