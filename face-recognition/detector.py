@@ -6,7 +6,7 @@ import csv
 from PIL import Image
 
 # saving face image logic
-MAX_FACES = 50
+MAX_FACES = 25
 IMG_SIZES = (500, 500)
 USER_FACES_DIR = './faces'
 TEST_FACES_DIR = './test_faces'
@@ -183,9 +183,10 @@ class FaceDetector:
         self.camera.release()
         cv2.destroyAllWindows()
 
+        print("Finished Generating Data!")
+
 
 # testing
 if __name__ == '__main__':
     face_detector = FaceDetector()
     face_detector.generateData()
-    print("Done!")

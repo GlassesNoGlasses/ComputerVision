@@ -6,7 +6,7 @@ from PIL import Image
 
 
 # face recognizer class
-class FaceRecognizer():
+class LBPH():
 
     def __init__(self, csv_path='face_encodings.csv', specs=(1, 8, 8, 8)):
         ''' Initialize the face recognizer with the face detector.'''

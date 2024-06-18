@@ -101,18 +101,21 @@ class Eigenface():
         self.mean_image = mean_face
 
 
-    def trainEigenface(self):
+    def trainRecognizer(self):
         ''' Train the eigenface SVC model.'''
 
+        #initialize pca
+        self.pcaInit()
+
         # initialize svc model
-        self.svc = svm.SVC(C=10.0, kernel='rbf', gamma=0.001, random_state=RANDOM_STATE)
+        self.face_recognizer = svm.SVC(C=10.0, kernel='rbf', gamma=0.001, random_state=RANDOM_STATE)
 
         print("[INFO] Training SVC model...")
 
         # train the model
 
         start = time.time()
-        self.trainX = self.svc.fit(self.trainX, self.trainY)
+        self.trainX = self.face_recognizer.fit(self.trainX, self.trainY)
         end = time.time()
 
         print(f'Training took {end - start} seconds.')
@@ -120,70 +123,16 @@ class Eigenface():
         # evaluate the model on test data
         print("[INFO] evaluating model...")
 
-        predictions = self.svc.predict(self.pca.transform(self.testX))
+        predictions = self.face_recognizer.predict(self.pca.transform(self.testX))
         print(metrics.classification_report(self.testY, predictions,
             target_names=['imposter', 'user']))
     
         # save the model
         with open('eigenface_model.pkl','wb') as f:
-            pickle.dump(self.svc, f)
-
-
-    def predictEigenface(self):
-        ''' Predict the face using the eigenface model.'''
-
-        camera = cv2.VideoCapture(1)
-        detector = FaceDetector()
-
-        while camera.isOpened():
-
-            # get key press if exists
-            key = cv2.waitKey(33)
-
-            if key == ESC:
-                break
-
-            # read frame from camera
-            ret, frame = camera.read()
-
-            if not ret:
-                print('Error reading frame.')
-                break
-
-            # get the face frame
-            face_image, coords = detector.getFaceFrame(frame)
-
-            # could not detect face
-            if face_image is None or face_image.shape != IMG_SIZES or coords is None:
-                continue
-
-            # get face coords
-            x, y, w, h = coords
-
-            # draw rectangle on face
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-            
-            # convert face image to numpy array
-            pca_image = face_image.flatten()
-
-            # apply PCA dimension reduction and predict
-            pca_frame = self.pca.transform(pca_image.reshape(1, -1))
-            prediction = self.svc.predict(pca_frame)
-
-            if prediction[0] == 1:
-                cv2.putText(frame, 'Person: User', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-            else:
-                cv2.putText(frame, 'Person: Imposter', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-
-            cv2.imshow('Eigenface', frame)
-        
-        camera.release()
-        cv2.destroyAllWindows()
-
+            pickle.dump(self.face_recognizer, f)
 
 
 if __name__ == '__main__':
     eigenface = Eigenface()
     eigenface.pcaInit()
-    eigenface.trainEigenface()
-    # eigenface.predictEigenface()
+    eigenface.trainRecognizer()
